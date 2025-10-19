@@ -1,0 +1,6 @@
+*.o
+P1
+someFile.fs25s1
+*.inorder
+*.preorder
+*.postorder
