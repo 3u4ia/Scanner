@@ -3,19 +3,11 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <vector>
+#include "ScannerClass/Scanner.h"
 
 
 bool getInput(char [], char **, char *argv[], int);
-void trim(char *, char *);
 void tokenize(char *, char**, int);
-
-
-enum tokenID {
-	IDENT_tk,
-	NUM_tk,
-	KW_tk, 
-	DELIM_tk
-};
 
 
 int main(int argc, char* argv[]) {
@@ -34,9 +26,12 @@ int main(int argc, char* argv[]) {
 		printf("argv[1]: %s\n", input);
 		size_t fileNameSize = strlen(input) + strlen(extension);
 		fileName = (char *)malloc(sizeof(char) * (fileNameSize + 1));
+		printf("fileNameSize: %d\n", fileNameSize);
 	
 		strncpy(fileName, input, fileNameSize);
-		strncat(fileName, extension, fileNameSize - strlen(extension) - 1); // -1 to give room for null terminator '\0'
+		//fileName[fileNameSize] = '\0';
+		strncat(fileName, extension, strlen(extension)); // -1 to give room for null terminator '\0'
+		printf("fileName: %s\n", fileName);
 
 		// Open File
 		file = fopen(fileName, "r");
@@ -67,11 +62,19 @@ int main(int argc, char* argv[]) {
 			// 	class will have scanner().
 			// 		inside scanner() there will be a filter() that filters out whitespace
 			// You will retrieve token of type {tokenId, tokenInstance: reference to a string table, line#
+			printf("hello\n");
 
 		}
 	
 	}
-	trim(textBuffer, cleanBuffer);
+
+	printf("heya!!!\n");
+
+	Scanner scannerObj(textBuffer);
+	scannerObj.scanToken();
+	printf("After\n");
+
+	
 
 	
 
@@ -125,43 +128,4 @@ bool getInput(char textBuffer[], char **input, char *argv[], int argc) {
 
 }
 
-void trim(char *src, char *dest) {
-	if(!src || !dest) {
-		return;
-	}
-
-	size_t length = strlen(src);
-
-	if(!length) {
-		*dest = '\0';
-		return;
-	}
-
-	char *ptr = src + length - 1;
-
-	// remove trailing
-	while (ptr > src) {
-		if(!isspace(*ptr)) {
-			break;
-		}
-		ptr--;
-	}
-
-	ptr++;
-
-	char *tmp = src;
-	// remove leading
-	while(tmp < ptr && isspace(*tmp)) {
-		tmp++;
-	}
-
-	// Set output
-	while(tmp < ptr) {
-		*dest = *tmp;
-		*dest++;
-		*tmp++;
-	}
-
-	*dest = '\0';
-}
 
