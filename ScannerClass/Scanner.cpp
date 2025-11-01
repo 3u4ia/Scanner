@@ -154,7 +154,9 @@ Token Scanner::scanToken() {
 				printf("Error too many characters there should be nothing more than 8 characters in a token\n");
 				exit(1);
 			}
-			lexeme[lexemeIndex++] = lookahead;
+			if (lookahead != ' ' && lookahead != '\n') { // To prevent spaces going into lexemes
+				lexeme[lexemeIndex++] = lookahead;
+			}
 			continue;
 		}
 
@@ -219,6 +221,7 @@ static Token finalCase(int state, char *lexeme, int lineNumber) {
 
 static void checkKeywordOrValidId(char *lexeme) {
 	const char *keywords[] = {"go", "op", "loop", "int", "exit", "scan", "output", "cond", "then", "set", "func", "program"};
+	printf("lexeme strlen: %d\n", strlen(lexeme));
 	int arrayLen = sizeof(keywords) / sizeof(keywords[0]);
 	for (int i = 0; i < arrayLen; i++) {
 		if(strcmp(lexeme, keywords[i]) == 0) {
