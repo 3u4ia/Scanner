@@ -69,10 +69,10 @@ int main(int argc, char* argv[]) {
 
 
 	Scanner scannerObj(textBuffer);
-	int tk;
-	while(tk != EOFTK) {
+	Token tk;
+	while(tk.tokenID != EOFTK) {
 		tk = scannerObj.scanToken();
-		printf("Tk aquired: %d\n", tk);
+		printf("Tk aquired:\n\ttokenID: %s\n\tlexeme: %s\n\tlineNum: %d\n", tokenNames[tk.tokenID - 1000], tk.lexeme, tk.lineNum);
 	}
 	printf("After\n");
 

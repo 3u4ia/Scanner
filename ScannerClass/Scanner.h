@@ -7,17 +7,19 @@
 
 
 enum TokenID {
-	IDENT_tk,
-	NUM_tk,
-	KW_tk,
-	OP_tk,
-	DELIM_tk
+	IDTK = 1000,
+	NUMTK,
+	OPTK,
+	DELIMTK,
+	EOFTK,
+	KEYWORD
 };
 
 
-struct token {
+
+struct Token {
 	TokenID tokenID;
-	char *lexeme;
+	char lexeme[9];
 	int lineNum;
 };
 
@@ -46,13 +48,6 @@ enum Errors {
 	EXPSTAR,
 };
 
-enum FINALS {
-	IDTK = 1000,
-	NUMTK,
-	OPTK,
-	DELIMTK,
-	EOFTK
-};
 
 enum INVALIDS {
 	INVALID = -2000,
@@ -65,11 +60,11 @@ enum INVALIDS {
 
 class Scanner {
 	private:
-		char currChar;
+		char lookahead;
 		int lineCount = 0;
 		int charGroup = -1; // init used as a flag to determine whether the scanner is on the first char of the first token
 		char textBuffer[1024];
-		char *currCharPlace;
+		char *lookaheadPlace;
 		static const int NUMOFSTATES = 13;
 		static const int NUMOFCOLUMNS = 10;
 
@@ -97,7 +92,7 @@ class Scanner {
 		
 		int filter();
 
-		int scanToken();
+		Token scanToken();
 		
 };
 
