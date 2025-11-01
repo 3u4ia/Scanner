@@ -21,4 +21,4 @@ $(OBJS2): $(CLSFLDR)/Scanner.cpp $(CLSFLDR)/Scanner.h
 	$(CC) $(CFLAGS) -c $(CLSFLDR)/Scanner.cpp -o $(CLSFLDR)/$(OBJS2)
 
 clean:
-	/bin/rm -f *.o ./ScannerClass/*.o $(TARGET)
+	/bin/rm -f *.o ./ScannerClass/*.o *.fs25s1 $(TARGET)

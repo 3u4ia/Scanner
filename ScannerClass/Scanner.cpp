@@ -88,7 +88,6 @@ Scanner::Scanner(const char *strPtr) {
 	int len = strlen(strPtr);
 	for(; i <= len; i++) {   // <= because i want to include the \0 or EOF
 		textBuffer[i] = strPtr[i];
-		printf(" [%d] = '%c' (int %d)\n", i, textBuffer[i], (unsigned char)textBuffer[i]);
 	}	
 	lookaheadPlace = textBuffer;
 }
@@ -105,73 +104,72 @@ int Scanner::filter() {
 	}
 
 	if(isalpha(lookahead)){
-		printf("filter: returning letter\n");
+		//printf("filter: returning letter\n");
 		return LETTER;
 	}
 	if(isdigit(lookahead)){
-		printf("filter: returning digit\n");
+		//printf("filter: returning digit\n");
 		return DIGIT;
 	}
 
 	switch (lookahead) {
 		case ' ': 
-			printf("filter: returning space\n");
+			//printf("filter: returning space\n");
 			return SPACE;
 		case '\n':
-			printf("filter: got newline returning space\n\n\n\n\n");
+			//printf("filter: got newline returning space\n\n\n\n\n");
 			lineCount++;
 			return SPACE;
 		case '\0':
-			printf("filter: returning EOFCHAR got backslash 0\n"); 
+			//printf("filter: returning EOFCHAR got backslash 0\n"); 
 			return EOFCHAR;
 		case EOF: 
-			printf("filter: returning EOFCHAR got EOF\n");
+			//printf("filter: returning EOFCHAR got EOF\n");
 			return EOFCHAR;
 		case '?': 
-			printf("filter: returning ?\n");
+			//printf("filter: returning ?\n");
 			return QUESTIONMARK;
 		case '/': 
-			printf("filter: returning /\n");
+			//printf("filter: returning /\n");
 			return SLASH;
 		case '*': 
-			printf("filter: returning *\n");
+			//printf("filter: returning *\n");
 			return STAR;
 		case '(': 
-			printf("filter: returning (\n");
+			//printf("filter: returning (\n");
 			return DELIM;
 		case ')': 
-			printf("filter: returning )\n");
+			//printf("filter: returning )\n");
 			return DELIM;
 		case '{': 
-			printf("filter: returning {\n");
+			//printf("filter: returning {\n");
 			return DELIM;
 		case '}': 
-			printf("filter: returning }\n");
+			//printf("filter: returning }\n");
 			return DELIM;
 		case '[': 
-			printf("filter: returning [\n"); 
+			//printf("filter: returning [\n"); 
 			return DELIM;
 		case ']': 
-			printf("filter: returning ]\n");
+			//printf("filter: returning ]\n");
 			return DELIM;
 		case ';': 
-			printf("filter: returning ;\n");
+			//printf("filter: returning ;\n");
 			return DELIM;
 		case ':': 
-			printf("filter: returning :\n");
+			//printf("filter: returning :\n");
 			return OPERATOR;
 		case '+': 
-			printf("filter: returning +\n");
+			//printf("filter: returning +\n");
 			return OPERATOR;
 		case '-': 
-			printf("filter: returning -\n");
+			//printf("filter: returning -\n");
 			return OPERATOR;
 		case '=': 
-			printf("filter: returning =\n");
+			//printf("filter: returning =\n");
 			return OPERATOR;
 	}
 
-	printf("invalidChar found in filter\n");
 	return 0; // Stands for invalid char in the table
 	
 	
@@ -180,20 +178,22 @@ int Scanner::filter() {
 int Scanner::scanToken() {
 	char lexeme[9] = "";
 	int state = 0;
-	char currChar;
 	int lexemeIndex = 0;
 	bool isFirstCharScanned = false;
+	bool useLookahead = false;
 	if(charGroup != -1) {
-		currChar = lookahead;
+		useLookahead = true;
 	}
 
 	do {
-		// logic to handle the fact that we always get an extra character when checking if the state is final so sometimes we can skip getting another charGroup since we still have the old one
-		charGroup = filter();
+		// logic to handle the fact that we always get an extra character when checking if the state is final so we use the last char group we got from the last token for the JUST the first character
+		if (!useLookahead) {
+			charGroup = filter();
+		}
+		useLookahead = false;
 
 		// Get the state from the Finite Automata Table
 		state = FATable[state][charGroup];
-		printf("I just got this state: %d\n", state);
 
 		// From the enums
 		if(state >= -1000 && state < -997) {
@@ -206,6 +206,7 @@ int Scanner::scanToken() {
 		} 
 		else if (state >= 1000 && state < 1005) {
 			lexeme[lexemeIndex] = '\0';
+			printf("token: %s\n", lexeme);
 			return finalCase(state, lexeme);
 		}
 		else if (state >= 0 && state < 13) {
@@ -213,14 +214,12 @@ int Scanner::scanToken() {
 				printf("Error too many characters there should be nothing more than 8 characters in a token\n");
 				exit(1);
 			}
-			currChar = lookahead;
 			lexeme[lexemeIndex++] = lookahead;
 			continue;
 		}
 
 	} while(charGroup != EOFCHAR);
 	printf("Total line count: %d\n", lineCount);
-	printf("Oh no we hit this line\n\n\n");
 	return EOFTK;
 	
 }
