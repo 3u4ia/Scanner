@@ -62,16 +62,18 @@ int main(int argc, char* argv[]) {
 			// 	class will have scanner().
 			// 		inside scanner() there will be a filter() that filters out whitespace
 			// You will retrieve token of type {tokenId, tokenInstance: reference to a string table, line#
-			printf("hello\n");
 
 		}
 	
 	}
 
-	printf("heya!!!\n");
 
 	Scanner scannerObj(textBuffer);
-	scannerObj.scanToken();
+	int tk;
+	while(tk != EOFTK) {
+		tk = scannerObj.scanToken();
+		printf("Tk aquired: %d\n", tk);
+	}
 	printf("After\n");
 
 	
