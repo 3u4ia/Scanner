@@ -1,72 +1,11 @@
 #include "Scanner.h"
 #include <cctype>
-static int finalCase(int state, char *lexeme);
+static Token finalCase(int state, char *lexeme, int lineNum);
 static void checkKeywordOrValidId(char *lexeme);
 static void invalidCase(int state, char currentChar);
 static void errorCase(int state, char currentChar);
-// FILE filePtr
-// character lookahead
-// int lineCount
-// char *lookaheadPlace
-//
-//enum TokenID {
-//	IDENT_tk,
-//	NUM_tk,
-//	KW_tk,
-//	OP_tk,
-//	DELIM_tk
-//};
-//
-//
-//
-//
-/*struct token {
-//	TokenID tokenID;
-//	char *lexeme;
-//	int lineNum;
-//};
 
 
-//extern const char *tokenNames[];
-
-enum States {
-	S1,
-	S2,
-	S3,
-	S4,
-	S5,
-	S6,		
-	S7,
-	S8,
-	S9,
-	S10,
-	S11,
-	S12,
-	S13
-};
-
-enum Errors {
-	EXPLETTER = -1000,
-	EXPSLASH,
-	EXPSTAR,
-};
-
-enum FINALS {
-	IDTK = 1000,
-	NUMTK,
-	OPTK,
-	DELIMTK,
-	EOFTK
-};
-
-enum INVALIDS {
-	INVALID = -2000,
-	INVDLETTER,
-	INVDSLASH,
-	INVDSTAR,
-	
-}
-*/
 enum CharacterType {
 	LETTER = 1,
 	DIGIT,
@@ -80,7 +19,7 @@ enum CharacterType {
 	INIT
 };
 
-const char *tokenNames[]= {"Identifier", "Number", "Keyword", "Operator", "Delimiter"};
+const char *tokenNames[]= {"Identifier", "Number", "Operator", "Delimiter", "EOF", "Keyword"};
 
 
 Scanner::Scanner(const char *strPtr) {
@@ -119,6 +58,7 @@ int Scanner::filter() {
 		case '\n':
 			//printf("filter: got newline returning space\n\n\n\n\n");
 			lineCount++;
+			lookahead = ' ';
 			return SPACE;
 		case '\0':
 			//printf("filter: returning EOFCHAR got backslash 0\n"); 
@@ -175,7 +115,7 @@ int Scanner::filter() {
 	
 }
 
-int Scanner::scanToken() {
+Token Scanner::scanToken() {
 	char lexeme[9] = "";
 	int state = 0;
 	int lexemeIndex = 0;
@@ -207,7 +147,7 @@ int Scanner::scanToken() {
 		else if (state >= 1000 && state < 1005) {
 			lexeme[lexemeIndex] = '\0';
 			printf("token: %s\n", lexeme);
-			return finalCase(state, lexeme);
+			return finalCase(state, lexeme, lineCount);
 		}
 		else if (state >= 0 && state < 13) {
 			if (lexemeIndex == 8) {
@@ -220,11 +160,20 @@ int Scanner::scanToken() {
 
 	} while(charGroup != EOFCHAR);
 	printf("Total line count: %d\n", lineCount);
-	return EOFTK;
+	Token t;
+	t.lineNum = lineCount;
+	t.tokenID = EOFTK;
+	return t;
 	
 }
 
-
+/*
+ *struct token {
+	TokenID tokenID;
+	char *lexeme;
+	int lineNum;
+};
+*/
 void Scanner::incrementCharPtr() {
 	if(*lookaheadPlace == '\0') {
 		printf("*lookaheadPlace is backslash 0\n");
@@ -234,29 +183,38 @@ void Scanner::incrementCharPtr() {
 	lookahead = *lookaheadPlace++;
 }
 
-static int finalCase(int state, char *lexeme) {
+static Token finalCase(int state, char *lexeme, int lineNumber) {
+	Token token;
+	token.lineNum = lineNumber;
+	strcpy(token.lexeme, lexeme);
 	switch (state) {
 		case IDTK:
 			printf("Id found\n");
 			checkKeywordOrValidId(lexeme);
-			return IDTK;
+			token.tokenID = IDTK;
+			return token;
 		case NUMTK:
 			printf("number found\n");
-			return NUMTK;
+			token.tokenID = NUMTK;
+			return token;
 		case OPTK:
 			printf("operator found\n");
-			return OPTK;
+			token.tokenID = OPTK;
+			return token;
 		case DELIMTK:
 			printf("delimiter found\n");
-			return DELIMTK;
+			token.tokenID = DELIMTK;
+			return token;
 		case EOFTK:
 			printf("EOF found\n");
-			return EOFTK;
+			token.tokenID = EOFTK;
+			return token;
 		default:
 			printf("default case found in finalCase on line %d returning eoftk\n", 0);
 	}
 	printf("OH NO WE SHOULD NOT HAVE HIT THIS\n\n\n\n");
-	return EOFTK;
+	token.tokenID = EOFTK;
+	return token;
 }
 
 static void checkKeywordOrValidId(char *lexeme) {

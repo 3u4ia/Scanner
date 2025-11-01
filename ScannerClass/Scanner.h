@@ -7,17 +7,19 @@
 
 
 enum TokenID {
-	IDENT_tk,
-	NUM_tk,
-	KW_tk,
-	OP_tk,
-	DELIM_tk
+	IDTK = 1000,
+	NUMTK,
+	OPTK,
+	DELIMTK,
+	EOFTK,
+	KEYWORD
 };
 
 
-struct token {
+
+struct Token {
 	TokenID tokenID;
-	char *lexeme;
+	char lexeme[9];
 	int lineNum;
 };
 
@@ -46,13 +48,6 @@ enum Errors {
 	EXPSTAR,
 };
 
-enum FINALS {
-	IDTK = 1000,
-	NUMTK,
-	OPTK,
-	DELIMTK,
-	EOFTK
-};
 
 enum INVALIDS {
 	INVALID = -2000,
@@ -97,7 +92,7 @@ class Scanner {
 		
 		int filter();
 
-		int scanToken();
+		Token scanToken();
 		
 };
 
