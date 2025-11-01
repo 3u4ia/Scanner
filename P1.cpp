@@ -72,9 +72,8 @@ int main(int argc, char* argv[]) {
 	Token tk;
 	while(tk.tokenID != EOFTK) {
 		tk = scannerObj.scanToken();
-		printf("Tk aquired:\n\ttokenID: %s\n\tlexeme: %s\n\tlineNum: %d\n", tokenNames[tk.tokenID - 1000], tk.lexeme, tk.lineNum);
+		printf("Group=%s instance=%s Line=%d\n", tokenNames[tk.tokenID - 1000], tk.lexeme, tk.lineNum);
 	}
-	printf("After\n");
 
 	
 

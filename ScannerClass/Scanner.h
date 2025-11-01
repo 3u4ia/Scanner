@@ -61,7 +61,7 @@ enum INVALIDS {
 class Scanner {
 	private:
 		char lookahead;
-		int lineCount = 0;
+		int lineCount = 1;
 		int charGroup = -1; // init used as a flag to determine whether the scanner is on the first char of the first token
 		char textBuffer[1024];
 		char *lookaheadPlace;
