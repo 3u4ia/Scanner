@@ -5,9 +5,9 @@ static void checkKeywordOrValidId(char *lexeme);
 static void invalidCase(int state, char currentChar);
 static void errorCase(int state, char currentChar);
 // FILE filePtr
-// character currChar
+// character lookahead
 // int lineCount
-// char *currCharPlace
+// char *lookaheadPlace
 //
 //enum TokenID {
 //	IDENT_tk,
@@ -90,30 +90,30 @@ Scanner::Scanner(const char *strPtr) {
 		textBuffer[i] = strPtr[i];
 		printf(" [%d] = '%c' (int %d)\n", i, textBuffer[i], (unsigned char)textBuffer[i]);
 	}	
-	currCharPlace = textBuffer;
+	lookaheadPlace = textBuffer;
 }
 
 int Scanner::filter() {
-	//currChar = fgetc(filePtr);
+	//lookahead = fgetc(filePtr);
 	incrementCharPtr();
 
 
-	if(currChar == '@') {
+	if(lookahead == '@') {
 		do {
 			incrementCharPtr();
-		} while(currChar != '@');
+		} while(lookahead != '@');
 	}
 
-	if(isalpha(currChar)){
+	if(isalpha(lookahead)){
 		printf("filter: returning letter\n");
 		return LETTER;
 	}
-	if(isdigit(currChar)){
+	if(isdigit(lookahead)){
 		printf("filter: returning digit\n");
 		return DIGIT;
 	}
 
-	switch (currChar) {
+	switch (lookahead) {
 		case ' ': 
 			printf("filter: returning space\n");
 			return SPACE;
@@ -180,10 +180,11 @@ int Scanner::filter() {
 int Scanner::scanToken() {
 	char lexeme[9] = "";
 	int state = 0;
+	char currChar;
 	int lexemeIndex = 0;
 	bool isFirstCharScanned = false;
 	if(charGroup != -1) {
-		currCharPlace--;
+		currChar = lookahead;
 	}
 
 	do {
@@ -196,11 +197,11 @@ int Scanner::scanToken() {
 
 		// From the enums
 		if(state >= -1000 && state < -997) {
-			errorCase(state, currChar);
+			errorCase(state, lookahead);
 			exit(1);
 		}
 		else if (state >= -2000 && state < -1996) {
-			invalidCase(state, currChar);
+			invalidCase(state, lookahead);
 			exit(1);
 		} 
 		else if (state >= 1000 && state < 1005) {
@@ -212,7 +213,8 @@ int Scanner::scanToken() {
 				printf("Error too many characters there should be nothing more than 8 characters in a token\n");
 				exit(1);
 			}
-			lexeme[lexemeIndex++] = currChar;
+			currChar = lookahead;
+			lexeme[lexemeIndex++] = lookahead;
 			continue;
 		}
 
@@ -225,12 +227,12 @@ int Scanner::scanToken() {
 
 
 void Scanner::incrementCharPtr() {
-	if(*currCharPlace == '\0') {
-		printf("*currCharPlace is backslash 0\n");
-		currChar = '\0';
+	if(*lookaheadPlace == '\0') {
+		printf("*lookaheadPlace is backslash 0\n");
+		lookahead = '\0';
 		return;
 	}
-	currChar = *currCharPlace++;
+	lookahead = *lookaheadPlace++;
 }
 
 static int finalCase(int state, char *lexeme) {
