@@ -23,10 +23,8 @@ int main(int argc, char* argv[]) {
 	didHaveArg = getInput(textBuffer, &input, argv, argc);
 
 	if(didHaveArg) {
-		printf("argv[1]: %s\n", input);
 		size_t fileNameSize = strlen(input) + strlen(extension);
 		fileName = (char *)malloc(sizeof(char) * (fileNameSize + 1));
-		printf("fileNameSize: %d\n", fileNameSize);
 	
 		strncpy(fileName, input, fileNameSize);
 		//fileName[fileNameSize] = '\0';
@@ -72,9 +70,8 @@ int main(int argc, char* argv[]) {
 	Token tk;
 	while(tk.tokenID != EOFTK) {
 		tk = scannerObj.scanToken();
-		printf("Tk aquired:\n\ttokenID: %s\n\tlexeme: %s\n\tlineNum: %d\n", tokenNames[tk.tokenID - 1000], tk.lexeme, tk.lineNum);
+		printf("Group=%s instance=%s Line=%d\n", tokenNames[tk.tokenID - 1000], tk.lexeme, tk.lineNum);
 	}
-	printf("After\n");
 
 	
 

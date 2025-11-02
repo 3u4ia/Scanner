@@ -5,16 +5,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 enum TokenID {
 	IDTK = 1000,
 	NUMTK,
 	OPTK,
 	DELIMTK,
 	EOFTK,
-	KEYWORD
+	KEYWORD,
+	DELOPTK,
+	LEOPTK,
+	GEOPTK,
+	LTOPTK,
+	GTOPTK,
+	NEOPTK,
+	EQOPTK,
+	ASSIGNOPTK,
+	DBLESTAR,
+	DBLESLASH,
+	LFTPARENDELIM,
+	RGHTPARENDELIM,
+	LFTCURLYDELIM,
+	RGHTCURLYDELIM,
+	LFTSQREDELIM,
+	RGHTSQREDELIM,
+	SEMICOLON
 };
-
 
 
 struct Token {
@@ -61,7 +76,7 @@ enum INVALIDS {
 class Scanner {
 	private:
 		char lookahead;
-		int lineCount = 0;
+		int lineCount = 1;
 		int charGroup = -1; // init used as a flag to determine whether the scanner is on the first char of the first token
 		char textBuffer[1024];
 		char *lookaheadPlace;
