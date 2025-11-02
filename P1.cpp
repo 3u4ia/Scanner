@@ -23,10 +23,8 @@ int main(int argc, char* argv[]) {
 	didHaveArg = getInput(textBuffer, &input, argv, argc);
 
 	if(didHaveArg) {
-		printf("argv[1]: %s\n", input);
 		size_t fileNameSize = strlen(input) + strlen(extension);
 		fileName = (char *)malloc(sizeof(char) * (fileNameSize + 1));
-		printf("fileNameSize: %d\n", fileNameSize);
 	
 		strncpy(fileName, input, fileNameSize);
 		//fileName[fileNameSize] = '\0';

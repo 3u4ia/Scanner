@@ -1,10 +1,14 @@
 #include "Scanner.h"
 #include <cctype>
-static Token finalCase(int state, char *lexeme, int lineNum);
+
 static bool checkKeyword(char *lexeme);
 static void invalidCase(int state, char currentChar);
 static void errorCase(int state, char currentChar);
-static void checkIfValidIDTK(char *lexeme);
+static void checkIfValidIDTK(char *lexeme, int lineNumber);
+static TokenID checkIfValidOperator(char *lexeme, int lineNumber);
+static TokenID getDelimTokenID(char *lexeme);
+static Token finalCase(int state, char *lexeme, int lineNum);
+
 
 enum CharacterType {
 	LETTER = 1,
@@ -18,8 +22,31 @@ enum CharacterType {
 	SPACE,
 	INIT
 };
-
-const char *tokenNames[]= {"Identifier", "Number", "Operator", "Delimiter", "EOF", "Keyword"};
+/*
+	IDTK = 1000,
+	NUMTK,
+	OPTK,
+	DELIMTK,
+	EOFTK,
+	KEYWORD,
+	DELOPTK,
+	LEOPTK,
+	GEOPTK,
+	LTOPTK,
+	GTOPTK,
+	NEOPTK,
+	EQOPTK,
+	DBLESTAR,
+	DBLESLASH,
+	LFTPARENDELIM,
+	RGHTPARENDELIM,
+	LFTCURLYDELIM,
+	RGHTCURLYDELIM,
+	LFTSQREDELIM,
+	RGHTSQREDELIM,
+	SEMICOLON
+*/
+const char *tokenNames[]= {"IDTk", "NumTk", "OpTk", "DelimTk", "EOFTk", "KeywordTk", "DelOpTk", "LEOpTk", "GEOpTk", "LTOpTk", "GTOpTk", "NEOpTk", "EQOpTk", "AssignOpTk", "DoubleStarOpTk", "DoubleSlashOpTk", "LeftParenDelimTk", "RightParenDelimTk", "LeftCurlyDelimTk", "RightCurlyDelimTk", "LeftSquareDelimTk", "RightSqureDelimTk", "SemicolonTk"};
 
 
 Scanner::Scanner(const char *strPtr) {
@@ -40,6 +67,7 @@ int Scanner::filter() {
 		do {
 			incrementCharPtr();
 		} while(lookahead != '@');
+		incrementCharPtr(); // Once it finds the second @ lookahead needs to be something else
 	}
 
 	if(isalpha(lookahead)){
@@ -168,12 +196,10 @@ Token Scanner::scanToken() {
 		}
 
 	} while(charGroup != EOFCHAR);
-	printf("Total line count: %d\n", lineCount);
 	Token t;
 	t.lineNum = lineCount;
 	t.tokenID = EOFTK;
-	return t;
-	
+	return t;	
 }
 
 /*
@@ -182,14 +208,117 @@ Token Scanner::scanToken() {
 	char *lexeme;
 	int lineNum;
 };
+
+
 */
 void Scanner::incrementCharPtr() {
 	if(*lookaheadPlace == '\0') {
-		printf("*lookaheadPlace is backslash 0\n");
 		lookahead = '\0';
 		return;
 	}
 	lookahead = *lookaheadPlace++;
+}
+
+/*
+	IDTK = 1000,
+	NUMTK,
+	OPTK,
+	DELIMTK,
+	EOFTK,
+	KEYWORD,
+	DELOPTK,
+	LEOPTK,
+	GEOPTK,
+	LTOPTK,
+	GTOPTK,
+	NEOPTK,
+	EQOPTK,
+	DBLESTAR,
+	DBLESLASH,
+	LFTPARENDELIM,
+	RGHTPARENDELIM,
+	LFTCURLYDELIM,
+	RGHTCURLYDELIM,
+	LFTSQREDELIM,
+	RGHTSQREDELIM,
+	SEMICOLON
+
+*/
+
+
+static TokenID getDelimTokenID(char *lexeme) {
+	if(strcmp(lexeme, "(") == 0) {
+		return LFTPARENDELIM;
+	}
+	else if (strcmp(lexeme, ")") == 0) {
+		return RGHTPARENDELIM;
+	}
+	else if (strcmp(lexeme, "{") == 0) {
+		return LFTCURLYDELIM;
+	}
+	else if (strcmp(lexeme, "}") == 0) {
+		return RGHTCURLYDELIM;
+	}
+	else if (strcmp(lexeme, "[") == 0) {
+		return LFTSQREDELIM;
+	}
+	else if (strcmp(lexeme, "]") == 0) {
+		return RGHTSQREDELIM;
+	}
+	else if (strcmp(lexeme, ";") == 0) {
+		return SEMICOLON;
+	}
+	else {
+		printf("Error no matching delim found for :%s\n", lexeme);
+		exit(1);
+	}
+
+}
+
+
+static TokenID checkIfValidOperator(char *lexeme, int lineNumber) {
+
+	if(strcmp(lexeme, "?le") == 0) {
+		return LEOPTK;
+	}
+	else if (strcmp(lexeme, "?ge") == 0) {
+		return GEOPTK;
+	}
+	else if (strcmp(lexeme, "?lt") == 0) {
+		return LTOPTK;
+	}
+	else if (strcmp(lexeme, "?gt") == 0) {
+		return GTOPTK;
+	}
+	else if (strcmp(lexeme, "?ne") == 0) {
+		return NEOPTK;
+	}
+	else if (strcmp(lexeme, "?eq") == 0) {
+		return EQOPTK;
+	}
+	else if (strcmp(lexeme, "**") == 0) {
+		return DBLESTAR;
+	}
+	else if (strcmp(lexeme, "//") == 0) {
+		return DBLESLASH;
+	}
+	else if (strcmp(lexeme, "+") == 0) {
+		return OPTK;
+	}
+	else if (strcmp(lexeme, "-") == 0) {
+		return OPTK;
+	}
+	else if (strcmp(lexeme, "=") == 0) {
+		return ASSIGNOPTK;
+	}
+	else if (strcmp(lexeme, ":") == 0) {
+		return DELOPTK;
+	}
+	else {
+		printf("Invalid Operator found: %s on line %d", lexeme, lineNumber);
+		exit(1);
+
+	}
 }
 
 static Token finalCase(int state, char *lexeme, int lineNumber) {
@@ -201,7 +330,7 @@ static Token finalCase(int state, char *lexeme, int lineNumber) {
 			if(checkKeyword(lexeme) == true) {
 				token.tokenID = KEYWORD;
 			} else {
-				checkIfValidIDTK(lexeme);
+				checkIfValidIDTK(lexeme, lineNumber);
 				token.tokenID = IDTK;
 			}
 			return token;
@@ -209,10 +338,10 @@ static Token finalCase(int state, char *lexeme, int lineNumber) {
 			token.tokenID = NUMTK;
 			return token;
 		case OPTK:
-			token.tokenID = OPTK;
+			token.tokenID = checkIfValidOperator(lexeme, lineNumber); // Fails if invalid operator
 			return token;
 		case DELIMTK:
-			token.tokenID = DELIMTK;
+			token.tokenID = getDelimTokenID(lexeme);
 			return token;
 		case EOFTK:
 			token.tokenID = EOFTK;
@@ -223,16 +352,16 @@ static Token finalCase(int state, char *lexeme, int lineNumber) {
 }
 
 
-static void checkIfValidIDTK(char *lexeme){
+static void checkIfValidIDTK(char *lexeme, int lineNumber){
 	if(lexeme[0] != 'x') {
-		printf("Error: All ID tokens must start with the letter x got: %c\n", lexeme[0]);
+		printf("Error: All ID tokens must start with the letter x got: %c on line: %d\n", lexeme[0], lineNumber);
 		exit(1);
 	}
 }
 
 
 static bool checkKeyword(char *lexeme) {
-	const char *keywords[] = {"go", "op", "loop", "int", "exit", "scan", "output", "cond", "then", "set", "func", "program"};
+	const char *keywords[] = {"go", "og", "loop", "int", "exit", "scan", "output", "cond", "then", "set", "func", "program"};
 	int arrayLen = sizeof(keywords) / sizeof(keywords[0]);
 	for (int i = 0; i < arrayLen; i++) {
 		if(strcmp(lexeme, keywords[i]) == 0) {
