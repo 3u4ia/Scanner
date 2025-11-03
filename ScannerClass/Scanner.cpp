@@ -22,31 +22,6 @@ enum CharacterType {
 	SPACE,
 	INIT
 };
-/*
-	IDTK = 1000,
-	NUMTK,
-	OPTK,
-	DELIMTK,
-	EOFTK,
-	KEYWORD,
-	DELOPTK,
-	LEOPTK,
-	GEOPTK,
-	LTOPTK,
-	GTOPTK,
-	NEOPTK,
-	EQOPTK,
-	DBLESTAR,
-	DBLESLASH,
-	LFTPARENDELIM,
-	RGHTPARENDELIM,
-	LFTCURLYDELIM,
-	RGHTCURLYDELIM,
-	LFTSQREDELIM,
-	RGHTSQREDELIM,
-	SEMICOLON
-*/
-const char *tokenNames[]= {"IDTk", "NumTk", "OpTk", "DelimTk", "EOFTk", "KeywordTk", "DelOpTk", "LEOpTk", "GEOpTk", "LTOpTk", "GTOpTk", "NEOpTk", "EQOpTk", "AssignOpTk", "DoubleStarOpTk", "DoubleSlashOpTk", "LeftParenDelimTk", "RightParenDelimTk", "LeftCurlyDelimTk", "RightCurlyDelimTk", "LeftSquareDelimTk", "RightSqureDelimTk", "SemicolonTk"};
 
 
 Scanner::Scanner(const char *strPtr) {
@@ -71,70 +46,50 @@ int Scanner::filter() {
 	}
 
 	if(isalpha(lookahead)){
-		//printf("filter: returning letter\n");
 		return LETTER;
 	}
 	if(isdigit(lookahead)){
-		//printf("filter: returning digit\n");
 		return DIGIT;
 	}
 
 	switch (lookahead) {
 		case ' ': 
-			//printf("filter: returning space\n");
 			return SPACE;
 		case '\n':
-			//printf("filter: got newline returning space\n\n\n\n\n");
 			return SPACE;
 		case '\t':
 			return SPACE;
 		case '\0':
-			//printf("filter: returning EOFCHAR got backslash 0\n"); 
 			return EOFCHAR;
 		case EOF: 
-			//printf("filter: returning EOFCHAR got EOF\n");
 			return EOFCHAR;
 		case '?': 
-			//printf("filter: returning ?\n");
 			return QUESTIONMARK;
 		case '/': 
-			//printf("filter: returning /\n");
 			return SLASH;
 		case '*': 
-			//printf("filter: returning *\n");
 			return STAR;
 		case '(': 
-			//printf("filter: returning (\n");
 			return DELIM;
 		case ')': 
-			//printf("filter: returning )\n");
 			return DELIM;
 		case '{': 
-			//printf("filter: returning {\n");
 			return DELIM;
 		case '}': 
-			//printf("filter: returning }\n");
 			return DELIM;
 		case '[': 
-			//printf("filter: returning [\n"); 
 			return DELIM;
 		case ']': 
-			//printf("filter: returning ]\n");
 			return DELIM;
 		case ';': 
-			//printf("filter: returning ;\n");
 			return DELIM;
 		case ':': 
-			//printf("filter: returning :\n");
 			return OPERATOR;
 		case '+': 
-			//printf("filter: returning +\n");
 			return OPERATOR;
 		case '-': 
-			//printf("filter: returning -\n");
 			return OPERATOR;
 		case '=': 
-			//printf("filter: returning =\n");
 			return OPERATOR;
 	}
 
@@ -202,15 +157,6 @@ Token Scanner::scanToken() {
 	return t;	
 }
 
-/*
- *struct token {
-	TokenID tokenID;
-	char *lexeme;
-	int lineNum;
-};
-
-
-*/
 void Scanner::incrementCharPtr() {
 	if(*lookaheadPlace == '\0') {
 		lookahead = '\0';
@@ -218,32 +164,6 @@ void Scanner::incrementCharPtr() {
 	}
 	lookahead = *lookaheadPlace++;
 }
-
-/*
-	IDTK = 1000,
-	NUMTK,
-	OPTK,
-	DELIMTK,
-	EOFTK,
-	KEYWORD,
-	DELOPTK,
-	LEOPTK,
-	GEOPTK,
-	LTOPTK,
-	GTOPTK,
-	NEOPTK,
-	EQOPTK,
-	DBLESTAR,
-	DBLESLASH,
-	LFTPARENDELIM,
-	RGHTPARENDELIM,
-	LFTCURLYDELIM,
-	RGHTCURLYDELIM,
-	LFTSQREDELIM,
-	RGHTSQREDELIM,
-	SEMICOLON
-
-*/
 
 
 static TokenID getDelimTokenID(char *lexeme) {
